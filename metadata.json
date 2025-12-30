@@ -1,0 +1,7 @@
+{
+  "name": "EcoFarm Pro 3D",
+  "description": "A realistic 3D farming simulator featuring crop management, poultry building, and dairy farming with an AI-powered assistant.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
