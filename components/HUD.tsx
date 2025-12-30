@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useGameStore, FarmLevel } from '../store';
-import { Wallet, TrendingUp, Sprout, Bird, Beef, ShoppingCart, Zap, Wheat } from 'lucide-react';
+import { Wallet, TrendingUp, Sprout, Bird, Milk, ShoppingCart, Zap, Wheat, Package } from 'lucide-react';
 
 export const HUD: React.FC = () => {
   const { money, level, inventory, sellAll, lastSaleAmount, setShowLevelUpModal } = useGameStore();
@@ -75,20 +75,27 @@ export const HUD: React.FC = () => {
       </div>
 
       {/* Bottom Bar: Inventory and Actions */}
-      <div className="flex justify-between items-end">
-        <div className="bg-white/95 backdrop-blur p-6 rounded-[2.5rem] shadow-2xl border border-gray-100 flex gap-8 pointer-events-auto">
-          <InventoryItem icon={<Sprout />} count={inventory.crops} label="Yield" color="text-green-600" />
-          <InventoryItem icon={<Bird />} count={inventory.eggs} label="Eggs" color="text-yellow-600" />
-          <InventoryItem icon={<Beef />} count={inventory.milk} label="Milk" color="text-blue-600" />
-          <InventoryItem icon={<Wheat />} count={inventory.cowFood} label="Feed" color="text-orange-600" />
+      <div className="flex justify-between items-end gap-4">
+        <div className="bg-white/95 backdrop-blur p-4 rounded-[2.5rem] shadow-2xl border border-gray-100 flex items-center gap-6 pointer-events-auto overflow-x-auto max-w-[70vw]">
+          <div className="flex items-center gap-4 px-2">
+            <InventoryItem icon={<Package />} count={inventory.seeds} label="Seeds" color="text-gray-600" />
+            <div className="w-[1px] h-12 bg-gray-200" />
+            <InventoryItem icon={<Sprout />} count={inventory.maize} label="Maize" color="text-green-600" />
+            <InventoryItem icon={<Sprout />} count={inventory.tomato} label="Tomato" color="text-red-600" />
+            <InventoryItem icon={<Wheat />} count={inventory.wheat} label="Wheat" color="text-amber-600" />
+            <div className="w-[1px] h-12 bg-gray-200" />
+            <InventoryItem icon={<Bird />} count={inventory.eggs} label="Eggs" color="text-yellow-600" />
+            <InventoryItem icon={<Milk />} count={inventory.milk} label="Milk" color="text-blue-600" />
+            <InventoryItem icon={<Wheat />} count={inventory.cowFood} label="Feed" color="text-orange-600" />
+          </div>
         </div>
 
         <button 
           onClick={sellAll}
-          className="bg-orange-600 hover:bg-orange-700 text-white px-12 py-8 rounded-[3rem] font-black text-2xl shadow-2xl transform transition hover:-translate-y-2 active:translate-y-0 pointer-events-auto flex items-center gap-5 border-b-8 border-orange-800 group"
+          className="bg-orange-600 hover:bg-orange-700 text-white px-10 py-6 rounded-[2.5rem] font-black text-xl shadow-2xl transform transition hover:-translate-y-2 active:translate-y-0 pointer-events-auto flex items-center gap-4 border-b-8 border-orange-800 group shrink-0"
         >
-          <ShoppingCart className="w-10 h-10 group-hover:rotate-12 transition-transform" />
-          LOAD LORRY & SELL
+          <ShoppingCart className="w-8 h-8 group-hover:rotate-12 transition-transform" />
+          SELL ALL
         </button>
       </div>
     </div>
@@ -96,11 +103,11 @@ export const HUD: React.FC = () => {
 };
 
 const InventoryItem: React.FC<{ icon: React.ReactNode, count: number, label: string, color: string }> = ({ icon, count, label, color }) => (
-  <div className="flex flex-col items-center">
-    <div className={`p-4 rounded-3xl bg-gray-50 mb-2 ${color} shadow-inner`}>
-      {React.cloneElement(icon as React.ReactElement, { size: 32 })}
+  <div className="flex flex-col items-center min-w-[60px]">
+    <div className={`p-2.5 rounded-2xl bg-gray-50 mb-1 ${color} shadow-inner`}>
+      {React.cloneElement(icon as React.ReactElement, { size: 20 })}
     </div>
-    <p className="text-3xl font-black text-gray-800">{count}</p>
-    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{label}</p>
+    <p className="text-xl font-black text-gray-800 leading-none">{count}</p>
+    <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{label}</p>
   </div>
 );

@@ -27,7 +27,7 @@ export interface CowData {
   status: 'grazing' | 'hungry' | 'eating' | 'ready';
   lastActionTime: number;
   position: [number, number, number];
-  milkYield: number; // Added milkYield to track production amount
+  milkYield: number;
 }
 
 export interface GameState {
@@ -40,7 +40,9 @@ export interface GameState {
   showLevelUpModal: boolean;
   inventory: {
     seeds: number;
-    crops: number;
+    maize: number;
+    tomato: number;
+    wheat: number;
     eggs: number;
     milk: number;
     chickens: number;
@@ -91,8 +93,10 @@ export const useGameStore = create<GameState>((set, get) => ({
   showGuide: true,
   showLevelUpModal: false,
   inventory: {
-    seeds: 10,
-    crops: 0,
+    seeds: 20, 
+    maize: 0,
+    tomato: 0,
+    wheat: 0,
     eggs: 0,
     milk: 0,
     chickens: 0,
@@ -157,19 +161,29 @@ export const useGameStore = create<GameState>((set, get) => ({
     if (get().selectedTool !== 'sickle') return;
     playSound('https://assets.mixkit.co/active_storage/sfx/2144/2144-preview.mp3', 0.5);
     set((state) => {
+      const crop = state.farmStatus.cropsPlanted[index];
       const planted = [...state.farmStatus.cropsPlanted];
       const tilled = [...state.farmStatus.tilledPlots];
       planted[index] = { ...planted[index], time: null };
       tilled[index] = false;
+
+      const newInventory = { ...state.inventory };
+      if (crop.type === 'maize') newInventory.maize += 1;
+      else if (crop.type === 'tomato') newInventory.tomato += 1;
+      else if (crop.type === 'wheat') newInventory.wheat += 1;
+
       return {
-        inventory: { ...state.inventory, crops: state.inventory.crops + 1 },
+        inventory: newInventory,
         farmStatus: { ...state.farmStatus, cropsPlanted: planted, tilledPlots: tilled }
       };
     });
   },
   sellAll: () => {
     const state = get();
-    const earnings = state.inventory.crops * 15 + state.inventory.eggs * 10 + state.inventory.milk * 5; // Balanced pricing per unit of milk
+    // Earnings from all types of products
+    const cropEarnings = (state.inventory.maize + state.inventory.tomato + state.inventory.wheat) * 15;
+    const earnings = cropEarnings + state.inventory.eggs * 10 + state.inventory.milk * 25; 
+    
     if (earnings === 0) return;
     set({ isSelling: true, lastSaleAmount: earnings });
     playSound('https://assets.mixkit.co/active_storage/sfx/2552/2552-preview.mp3');
@@ -180,11 +194,19 @@ export const useGameStore = create<GameState>((set, get) => ({
         const upgradeCosts: Record<number, number> = { 1: 300, 2: 1000, 3: 2500 };
         const cost = upgradeCosts[curr.level] || 0;
         const shouldShowModal = curr.level < FarmLevel.MARKET_TYCOON && newMoney >= cost;
-        const seedsToReplenish = curr.inventory.seeds < 10 ? 10 : curr.inventory.seeds;
+        const seedsToReplenish = curr.inventory.seeds < 20 ? 20 : curr.inventory.seeds;
 
         return {
           money: newMoney,
-          inventory: { ...curr.inventory, crops: 0, eggs: 0, milk: 0, seeds: seedsToReplenish },
+          inventory: { 
+            ...curr.inventory, 
+            maize: 0, 
+            tomato: 0, 
+            wheat: 0, 
+            eggs: 0, 
+            milk: 0, 
+            seeds: seedsToReplenish 
+          },
           isSelling: false,
           showLevelUpModal: shouldShowModal
         };
@@ -239,7 +261,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       id: Math.random().toString(36).substr(2, 9),
       status: 'grazing',
       lastActionTime: Date.now(),
-      position: [(Math.random() - 0.5) * 15, 1.2, (Math.random() - 0.5) * 15],
+      position: [(Math.random() - 0.5) * 20, 1.2, (Math.random() - 0.5) * 20],
       milkYield: 0,
     };
     set((state) => ({
@@ -273,10 +295,11 @@ export const useGameStore = create<GameState>((set, get) => ({
       farmStatus: {
         ...state.farmStatus,
         cows: state.farmStatus.cows.map(c => 
-          c.id === id ? { ...c, status: 'ready', milkYield: Math.floor(Math.random() * 8) + 6 } : c
+          c.id === id ? { ...c, status: 'ready', milkYield: Math.floor(Math.random() * 12) + 8 } : c
         )
       }
     }));
+    playSound('https://assets.mixkit.co/active_storage/sfx/1012/1012-preview.mp3', 0.3);
   },
   setCowHungry: (id) => {
     set((state) => ({
